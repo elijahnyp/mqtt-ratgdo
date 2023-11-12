@@ -13,6 +13,10 @@
 		"ratio": "cpp",
 		"tuple": "cpp",
 		"type_traits": "cpp",
-		"utility": "cpp"
-	}
+		"utility": "cpp",
+		"rolling_code.h": "c",
+		"rtc_cntl_reg.h": "c",
+		"*.ipp": "cpp"
+	},
+	"idf.adapterTargetName": "esp32"
 }

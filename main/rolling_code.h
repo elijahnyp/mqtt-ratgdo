@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
-#include <ArduinoJson.h>
-#include "BootstrapManager.h"
+// #include <ArduinoJson.h>
+// #include "BootstrapManager.h"
 
 extern "C" {
 #include "secplus.h"

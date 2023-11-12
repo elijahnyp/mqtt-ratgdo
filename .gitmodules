@@ -7,3 +7,6 @@
 [submodule "lib/secplus"]
 	path = lib/secplus
 	url = git@github.com:elijahnyp/secplus.git
+[submodule "components/wangwood_bootstrap"]
+	path = components/wangwood_bootstrap
+	url = git@github.com:elijahnyp/wangwood_bootstrap.git

@@ -15,59 +15,72 @@
 #define _RATGDO_H
 
 
-#include "BootstrapManager.h" // Must use the https://github.com/PaulWieland/arduinoImprovBootstrapper fork, ratgdo branch
-#include "SoftwareSerial.h" // Using espsoftwareserial https://github.com/plerup/espsoftwareserial
+/*
+temp esp32 pin definitions
+*/
+// #define D2 14
+// #define D7 15
+// #define D0 16
+// #define D8 17
+// #define ASSIGN_OUTPUT_GDO 18
+
+
+// #include "BootstrapManager.h" // Must use the https://github.com/PaulWieland/arduinoImprovBootstrapper fork, ratgdo branch
+// #include "SoftwareSerial.h" // Using espsoftwareserial https://github.com/plerup/espsoftwareserial
 #include "rolling_code.h"
 #include "static_code.h"
-#include "home_assistant.h"
+// #include "home_assistant.h"
 
-SoftwareSerial swSerial;
+// SoftwareSerial swSerial;
 
 /********************************** BOOTSTRAP MANAGER *****************************************/
-BootstrapManager bootstrapManager;
+// BootstrapManager bootstrapManager;
 
 /********************************** PIN DEFINITIONS *****************************************/
-#define INPUT_GDO D2 // 
-#define OUTPUT_GDO ASSIGN_OUTPUT_GDO // D1 // D4 // red control terminal / GarageDoorOpener (UART1 TX) pin is D4 on D1 Mini
-#define TRIGGER_OPEN D5 // dry contact for opening door
-#define TRIGGER_CLOSE D6 // dry contact for closing door
-#define TRIGGER_LIGHT D3 // dry contact for triggering light (no discrete light commands, so toggle only)
-#define STATUS_DOOR D0 // output door status, HIGH for open, LOW for closed
-#define STATUS_OBST D8 // output for obstruction status, HIGH for obstructed, LOW for clear
-#define INPUT_OBST D7 // black obstruction sensor terminal
+#define INPUT_GDO  21// 
+// #define INPUT_GDO D2 // 
+#define OUTPUT_GDO 16 // D1 // D4 // red control terminal / GarageDoorOpener (UART1 TX) pin is D4 on D1 Mini
+// #define OUTPUT_GDO ASSIGN_OUTPUT_GDO // D1 // D4 // red control terminal / GarageDoorOpener (UART1 TX) pin is D4 on D1 Mini
+// #define TRIGGER_OPEN D5 // dry contact for opening door
+// #define TRIGGER_CLOSE D6 // dry contact for closing door
+// #define TRIGGER_LIGHT D3 // dry contact for triggering light (no discrete light commands, so toggle only)
+// #define STATUS_DOOR D0 // output door status, HIGH for open, LOW for closed
+// #define STATUS_OBST D8 // output for obstruction status, HIGH for obstructed, LOW for clear
+#define INPUT_OBST 23 // black obstruction sensor terminal
+// #define INPUT_OBST D7 // black obstruction sensor terminal
 
 
 /********************************** MQTT TOPICS & Statuses *****************************************/
-String availabilityStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/availability
-// online|offline
+// String availabilityStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/availability
+// // online|offline
 
-String commandTopic = "";     // will be mqttTopicPrefix/deviceName/command/#
+// String commandTopic = "";     // will be mqttTopicPrefix/deviceName/command/#
 
-String doorCommandTopic = ""; // will be mqttTopicPrefix/deviceName/command/door
-                              // accepts [open|close|stop]
-String doorStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/door
+// String doorCommandTopic = ""; // will be mqttTopicPrefix/deviceName/command/door
+//                               // accepts [open|close|stop]
+// String doorStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/door
 uint8_t doorState = 0;
 String doorStates[7] = {"unknown","open","closed","stopped","opening","closing","syncing"};
 
 
-String lightCommandTopic = "";// will be mqttTopicPrefix/deviceName/command/light
-                              // accepts [on|off]
-String lightStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/light
+// String lightCommandTopic = "";// will be mqttTopicPrefix/deviceName/command/light
+//                               // accepts [on|off]
+// String lightStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/light
 uint8_t lightState = 2;
 String lightStates[3] = {"off","on","unknown"};
 
 
-String lockCommandTopic = ""; // will be mqttTopicPrefix/deviceName/command/lock
-                              // accepts [lock|unlock]
-String lockStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/lock
+// String lockCommandTopic = ""; // will be mqttTopicPrefix/deviceName/command/lock
+//                               // accepts [lock|unlock]
+// String lockStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/lock
 uint8_t lockState = 2;
 String lockStates[3] = {"unlocked","locked","unknown"};
 
-String motionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/motion
+// String motionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/motion
 uint8_t motionState = 0;
 String motionStates[2] = {"clear","detected"};
 
-String obstructionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/obstruction
+// String obstructionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/obstruction
 uint8_t obstructionState = 2;
 String obstructionStates[3] = {"obstructed","clear","unknown"};
 
@@ -125,18 +138,18 @@ void sendObstructionStatus();
 void statusUpdateLoop();
 
 void gdoStateLoop();
-void dryContactLoop();
-void wallPanelEmulatorLoop();
+// void dryContactLoop();
+// void wallPanelEmulatorLoop();
 
 void pullLow();
 
 /********************************** INTERRUPT SERVICE ROUTINES ***********************************/
-void IRAM_ATTR isrDebounce(const char *type);
-void IRAM_ATTR isrDoorOpen();
-void IRAM_ATTR isrDoorClose();
-void IRAM_ATTR isrLight();
+// void IRAM_ATTR isrDebounce(const char *type);
+// void IRAM_ATTR isrDoorOpen();
+// void IRAM_ATTR isrDoorClose();
+// void IRAM_ATTR isrLight();
 void IRAM_ATTR isrObstruction();
-void IRAM_ATTR isrRPM1();
-void IRAM_ATTR isrRPM2();
+// void IRAM_ATTR isrRPM1();
+// void IRAM_ATTR isrRPM2();
 
 #endif
