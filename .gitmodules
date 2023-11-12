@@ -1,0 +1,9 @@
+[submodule "components/esp32-wifi-manager"]
+	path = components/esp32-wifi-manager
+	url = https://github.com/elijahnyp/esp32-wifi-manager.git
+[submodule "components/arduino"]
+	path = components/arduino
+	url = https://github.com/espressif/arduino-esp32.git
+[submodule "lib/secplus"]
+	path = lib/secplus
+	url = git@github.com:elijahnyp/secplus.git
