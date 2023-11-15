@@ -16,7 +16,13 @@
 		"utility": "cpp",
 		"rolling_code.h": "c",
 		"rtc_cntl_reg.h": "c",
-		"*.ipp": "cpp"
+		"*.ipp": "cpp",
+		"charconv": "c",
+		"cstdio": "c",
+		"xlocnum": "c",
+		"uart_hal.h": "c",
+		"uart.h": "c",
+		"esp_spiffs.h": "c"
 	},
 	"idf.adapterTargetName": "esp32"
 }

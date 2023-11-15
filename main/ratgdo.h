@@ -29,14 +29,22 @@ temp esp32 pin definitions
 // #include "SoftwareSerial.h" // Using espsoftwareserial https://github.com/plerup/espsoftwareserial
 #include "rolling_code.h"
 #include "static_code.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include "driver/gpio.h"
+#include "esp_attr.h"
 // #include "home_assistant.h"
 
 // SoftwareSerial swSerial;
+
+void setup();
+void loop();
 
 /********************************** BOOTSTRAP MANAGER *****************************************/
 // BootstrapManager bootstrapManager;
 
 /********************************** PIN DEFINITIONS *****************************************/
+// MOVE THESE TO kconfig / idf.py menuconfig options!
 #define INPUT_GDO  21// 
 // #define INPUT_GDO D2 // 
 #define OUTPUT_GDO 16 // D1 // D4 // red control terminal / GarageDoorOpener (UART1 TX) pin is D4 on D1 Mini
@@ -60,40 +68,68 @@ temp esp32 pin definitions
 //                               // accepts [open|close|stop]
 // String doorStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/door
 uint8_t doorState = 0;
-String doorStates[7] = {"unknown","open","closed","stopped","opening","closing","syncing"};
+const char* doorStates[7] = {"unknown","open","closed","stopped","opening","closing","syncing"};
+typedef enum {
+    DOOR_UNKNOWN,
+    DOOR_OPEN,
+    DOOR_CLOSED,
+    DOOR_STOPPED,
+    DOOR_OPENING,
+    DOOR_CLOSING,
+    DOOR_SYNCING
+} door_states_t;
 
 
 // String lightCommandTopic = "";// will be mqttTopicPrefix/deviceName/command/light
 //                               // accepts [on|off]
 // String lightStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/light
 uint8_t lightState = 2;
-String lightStates[3] = {"off","on","unknown"};
+const char* lightStates[3] = {"off","on","unknown"};
+typedef enum {
+    LIGHT_OFF,
+    LIGHT_ON,
+    LIGHT_UNKNOWN
+} light_states_t;
 
 
 // String lockCommandTopic = ""; // will be mqttTopicPrefix/deviceName/command/lock
 //                               // accepts [lock|unlock]
 // String lockStatusTopic = "";  // will be mqttTopicPrefix/deviceName/status/lock
 uint8_t lockState = 2;
-String lockStates[3] = {"unlocked","locked","unknown"};
+const char* lockStates[3] = {"unlocked","locked","unknown"};
+typedef enum {
+    LOCK_UNLOCKED,
+    LOCK_LOCKED,
+    LOCK_UNKNOWN
+} lock_states_t;
 
 // String motionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/motion
 uint8_t motionState = 0;
-String motionStates[2] = {"clear","detected"};
+const char* motionStates[2] = {"clear","detected"};
+typedef enum {
+    MOTION_CLEAR,
+    MOTION_DETECTED
+} motion_states_t;
 
 // String obstructionStatusTopic = ""; // will be mqttTopicPrefix/deviceName/status/obstruction
 uint8_t obstructionState = 2;
-String obstructionStates[3] = {"obstructed","clear","unknown"};
+const char* obstructionStates[3] = {"obstructed","clear","unknown"};
+typedef enum {
+    OBST_OBSTRUCTED,
+    OBST_CLEAR,
+    OBST_UNKNOWN
+} obst_states_t;
 
 /********************************** GLOBAL VARS *****************************************/
 bool setupComplete = false;
 unsigned int rollingCodeCounter;
 unsigned int idCode;
-byte txSP1StaticCode[1];
-byte rxSP1StaticCode[SECPLUS1_CODE_LEN];
-byte secplus1States[19] = {0x35,0x35,0x35,0x35,0x33,0x33,0x53,0x53,0x38,0x3A,0x3A,0x3A,0x39,0x38,0x3A, 0x38,0x3A,0x39,0x3A};
+uint8_t txSP1StaticCode[1];
+uint8_t rxSP1StaticCode[SECPLUS1_CODE_LEN];
+uint8_t secplus1States[19] = {0x35,0x35,0x35,0x35,0x33,0x33,0x53,0x53,0x38,0x3A,0x3A,0x3A,0x39,0x38,0x3A, 0x38,0x3A,0x39,0x3A};
 
-byte txSP2RollingCode[SECPLUS2_CODE_LEN];
-byte rxSP2RollingCode[SECPLUS2_CODE_LEN];
+uint8_t txSP2RollingCode[SECPLUS2_CODE_LEN] = {0};
+uint8_t rxSP2RollingCode[SECPLUS2_CODE_LEN] = {0};
 
 unsigned int obstructionLowCount = 0;  // count obstruction low pulses
 bool obstructionSensorDetected = false;
@@ -105,13 +141,13 @@ bool dryContactDoorClose = false;
 bool dryContactToggleLight = false;
 
 /********************************** FUNCTION DECLARATION *****************************************/
-void callback(char *topic, byte *payload, unsigned int length);
-void manageDisconnections();
-void manageQueueSubscription();
-void manageHardwareButton();
+// void callback(char *topic, uint8_t *payload, unsigned int length);
+// void manageDisconnections();
+// void manageQueueSubscription();
+// void manageHardwareButton();
 
 void blink(bool trigger);
-void transmit(byte* payload, unsigned int length);
+void transmit(uint8_t* payload, unsigned int length);
 void sync();
 
 void toggleDoor();

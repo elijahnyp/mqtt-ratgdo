@@ -22,7 +22,7 @@ RUN apt-get update; \
         libusb-1.0-0
 
 RUN git clone --recursive https://github.com/espressif/esp-idf.git && \
-    cd esp-idf; git checkout v4.4.3 && \
+    cd esp-idf; git checkout b6a66b7d8c && \
     git submodule update --init --recursive
 ENV IDF_TOOLS_PATH=/idf_tools
 RUN cd /esp-idf/ && ./install.sh && \
