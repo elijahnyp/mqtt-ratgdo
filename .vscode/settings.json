@@ -22,7 +22,8 @@
 		"xlocnum": "c",
 		"uart_hal.h": "c",
 		"uart.h": "c",
-		"esp_spiffs.h": "c"
+		"esp_spiffs.h": "c",
+		"wwfeatures.h": "c"
 	},
 	"idf.adapterTargetName": "esp32"
 }

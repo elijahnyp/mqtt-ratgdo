@@ -14,6 +14,8 @@
 #ifndef _RATGDO_H
 #define _RATGDO_H
 
+// #include "wwfeatures.h"
+// #define FEATURE_CODE 0x00
 
 /*
 temp esp32 pin definitions

@@ -42,8 +42,44 @@ extern "C" {
 #endif
 void mqtt_handler(char* topic, uint8_t* payload, unsigned int length);
 
+#define DOOR_BIT 0
+#define LIGHT_BIT 1
+#define LOCK_BIT 2
+#define OBSTRUCTION_BIT 3
+
+ww_cust_status_t ratgdo_status = {
+		.state = NULL,
+		.num_entries = 4,
+		.entries[0] = {
+			.on = "Closed",
+			.off = "Open",
+			.name = "Door",
+			.bit = (1<<0)
+		},
+		.entries[1] = {
+			.on = "Light On",
+			.off = "Light Off",
+			.name = "Light",
+			.bit = (1<<1)
+		},
+		.entries[2] = {
+			.on = "Locked",
+			.off = "Unlocked",
+			.name = "Lock",
+			.bit = (1<<2)
+		},
+		.entries[3] = {
+			.on = "Clear",
+			.off = "Obstructed",
+			.name = "Obstructed",
+			.bit = (1<<3)
+		}
+	};
+
 void app_main(void){
 	wangwood_startup(&mqtt_handler);
+	ratgdo_status.state = xEventGroupCreate();
+	wangwood_register_custom_status(&ratgdo_status);
 	setup();
 	while(true){
 		loop();
@@ -179,9 +215,11 @@ void setup(){
 		if(err != ESP_OK){
 			ESP_LOGE(TAG,"ERROR SETTING PINS FOR SERIAL");
 		}
-		const int uart_buffer_size = (1024 * 2); //maybe adjust down?
-		QueueHandle_t uart_queue;
-		err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, &uart_queue, 0);
+		const int uart_buffer_size = (256); //maybe adjust down?
+		// QueueHandle_t uart_queue;
+		// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, &uart_queue, 0);
+		err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, 0);
+		// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, ESP_INTR_FLAG_IRAM);
 		if(err != ESP_OK){
 			ESP_LOGE(TAG,"ERROR INSTALLING UART DRIVER");
 		}
@@ -260,9 +298,10 @@ void loop(){
 
 	obstructionLoop();
 	gdoStateLoop();
-	// dryContactLoop();
 	statusUpdateLoop();
+
 	// wallPanelEmulatorLoop();
+	// dryContactLoop();
 }
 
 /*************************** DETECTING THE DOOR STATE ***************************/
@@ -402,7 +441,8 @@ void gdoStateLoop(){
 
 
 /*************************** OBSTRUCTION DETECTION ***************************/
-void IRAM_ATTR isrObstruction(){
+// void ESP_INTR_FLAG_IRAM isrObstruction(){
+void isrObstruction(){
 	if(gpio_get_level(INPUT_OBST)){
 		lastObstructionHigh = esp_timer_get_time() / 1000;
 	}else{
@@ -471,6 +511,11 @@ void statusUpdateLoop(){
 void sendDoorStatus(){
 	ESP_LOGI(TAG,"Door state: %s",doorStates[doorState]);
 	send_mqtt_event(doorStates[doorState]);
+	if(doorState != DOOR_OPEN){
+		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[DOOR_BIT].bit);
+	} else {
+		xEventGroupClearBits(ratgdo_status.state,ratgdo_status.entries[DOOR_BIT].bit);
+	}
 	// if(doorState == 1) digitalWrite(STATUS_DOOR, HIGH); // Open
 	// if(doorState == 2) digitalWrite(STATUS_DOOR, LOW); // Closed
 	
@@ -482,6 +527,11 @@ void sendDoorStatus(){
 void sendLightStatus(){
 	ESP_LOGI(TAG,"Light state: %s",lightStates[lightState]);
 	send_mqtt_event(lightStates[lightState]);
+	if(lightState != LIGHT_OFF){
+		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[LIGHT_BIT].bit);
+	} else {
+		xEventGroupClearBits(ratgdo_status.state,ratgdo_status.entries[LIGHT_BIT].bit);
+	}
 	// if(isConfigFileOk){
 	// 	bootstrapManager.publish(lightStatusTopic.c_str(), lightStates[lightState].c_str(), true);
 	// }
@@ -490,6 +540,11 @@ void sendLightStatus(){
 void sendLockStatus(){
 	ESP_LOGI(TAG,"Lock state: %s",lockStates[lockState]);
 	send_mqtt_event(lockStates[lockState]);
+	if(lockState != LOCK_UNLOCKED){
+		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[LOCK_BIT].bit);
+	} else {
+		xEventGroupClearBits(ratgdo_status.state,ratgdo_status.entries[LOCK_BIT].bit);
+	}
 	// if(isConfigFileOk){
 	// 	bootstrapManager.publish(lockStatusTopic.c_str(), lockStates[lockState].c_str(), true);
 	// }
@@ -514,6 +569,11 @@ void sendMotionStatus(){
 void sendObstructionStatus(){
 	ESP_LOGI(TAG,"Obstruction status: %s",obstructionStates[obstructionState]);
 	send_mqtt_event(obstructionStates[obstructionState]);
+	if(obstructionState != OBST_OBSTRUCTED){
+		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[OBSTRUCTION_BIT].bit);
+	} else {
+		xEventGroupClearBits(ratgdo_status.state,ratgdo_status.entries[OBSTRUCTION_BIT].bit);
+	}
 	// if(obstructionState == 0) digitalWrite(STATUS_OBST,HIGH); // obstructed
 	// if(obstructionState == 1) digitalWrite(STATUS_OBST,LOW); // clear
 
@@ -575,10 +635,10 @@ END CURRENT
 	// }
 	
 	// swSerial.write(payload,length); //serial
-	ESP_LOGI(TAG,"TEST: WRITING %u TO UART",length);
+	ESP_LOGD(TAG,"TEST: WRITING %u TO UART",length);
 	int status = uart_write_bytes(uart_num, payload, length);
-	ESP_LOGI(TAG,"TEST: WAITING FOR %i TO TRANSMIT",status);
-	err = uart_wait_tx_done(uart_num, pdMS_TO_TICKS(20));
+	ESP_LOGD(TAG,"TEST: WAITING FOR %i TO TRANSMIT",status);
+	err = uart_wait_tx_done(uart_num, pdMS_TO_TICKS(50));
 	if(err != ESP_OK){
 		ESP_LOGE(TAG,"UART TIMEOUT TRANSMITTING");
 	}
