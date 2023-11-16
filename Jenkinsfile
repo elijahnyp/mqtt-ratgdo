@@ -9,17 +9,16 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        withCredentials([GitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
+        // withCredentials([GitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
           sh '''export IDF_PATH=/esp-idf;
 . /esp-idf/export.sh;
-git submodule update --init --recursive
-chmod +x fullbuild.sh
-chmod +x build.sh
+git submodule update --init --recursive;
+chmod +x build.sh;
 ./build.sh ratgdo'''
         sh '''cd out;
 ls -lh
 '''
-        }
+        // }
       }
     }
 
