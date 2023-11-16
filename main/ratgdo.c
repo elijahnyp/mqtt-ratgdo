@@ -117,6 +117,8 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
   } else if(strncmp((char*)payload,"unlock",length) == 0){
 	ESP_LOGI(TAG,"UNLOCK");
 	unlock();
+  } else if(strncmp((char*)payload,"sync",length) == 0){
+	sync();
   } else if(strncmp((char*)payload,"reset",length) == 0){
 	deleteCounter("idCode");
 	deleteCounter("rolling");

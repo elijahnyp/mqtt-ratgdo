@@ -239,7 +239,7 @@ void readRollingCode(uint8_t rxSP2RollingCode[SECPLUS2_CODE_LEN], uint8_t *door,
 
 	uint16_t cmd = 0;
 	uint8_t nibble = 0;
-	uint8_t byte1 = 0;
+	// uint8_t byte1 = 0;
 	uint8_t byte2 = 0;
 
 	decode_wireline(rxSP2RollingCode, &rolling, &fixed, &data);
@@ -247,7 +247,7 @@ void readRollingCode(uint8_t rxSP2RollingCode[SECPLUS2_CODE_LEN], uint8_t *door,
 	cmd = ((fixed >> 24) & 0xf00) | (data & 0xff);
 
 	nibble = (data >> 8) & 0xf;
-	byte1 = (data >> 16) & 0xff;
+	// byte1 = (data >> 16) & 0xff;
 	byte2 = (data >> 24) & 0xff;
 
 	printRollingCode(rxSP2RollingCode);
