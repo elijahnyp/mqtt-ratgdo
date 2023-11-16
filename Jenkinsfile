@@ -14,7 +14,7 @@ pipeline {
 git submodule update --init --recursive
 chmod +x fullbuild.sh
 chmod +x build.sh
-./fullbuild.sh'''
+./build.sh ratgdo'''
         sh '''cd out;
 ls -lh
 '''
