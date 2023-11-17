@@ -3,7 +3,7 @@
 	url = https://github.com/elijahnyp/esp32-wifi-manager.git
 [submodule "lib/secplus"]
 	path = lib/secplus
-	url = git@github.com:elijahnyp/secplus.git
+	url = https://github.com/elijahnyp/secplus.git
 [submodule "components/wangwood_bootstrap"]
 	path = components/wangwood_bootstrap
-	url = git@github.com:elijahnyp/wangwood_bootstrap.git
+	url = https://github.com/elijahnyp/wangwood_bootstrap.git
