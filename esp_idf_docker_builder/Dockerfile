@@ -34,6 +34,6 @@ RUN pip3 install requests
 
 ARG jenkinsUserId=
 RUN if ! id $jenkinsUserId; then \
+    echo ${jenkinsUserId}; \
     usermod -u ${jenkinsUserId} jenkins; \
-    groupmod -g ${nodeId} jenkins; \
   fi

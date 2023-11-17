@@ -3,7 +3,7 @@ pipeline {
     dockerfile {
       filename 'esp_idf_docker_builder/Dockerfile'
       args '--dns 10.0.1.44 --dns 10.0.1.43'
-      additionalBuildArgs "--build-arg jenkinsUserId=\$(id -u jenkins)"
+      // additionalBuildArgs "--build-arg jenkinsUserId=\$(id -u jenkins)"
     }
 
   }
