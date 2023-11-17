@@ -124,8 +124,6 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
 	deleteCounter("rolling");
 
   }
-//   free(payload_c);
-//   payload_c = NULL;
 }
 
 #ifdef __cplusplus
@@ -135,227 +133,66 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
 
 
 void setup(){	
-	// Serial.begin(115200); // must remain at 115200 for improv
-	// Serial.println("");
-
-	// #ifndef DISABLE_WIFI // handeled elsewhere
-	// bootstrapManager.bootstrapSetup(manageDisconnections, manageHardwareButton, callback);
-	
-	// // Setup mqtt topics to subscribe to
-	// commandTopic = String(mqttTopicPrefix) + deviceName + "/command/#";
-
-	// // match these topic names
-	// doorCommandTopic = String(mqttTopicPrefix) + deviceName + "/command/door";
-	// lightCommandTopic = String(mqttTopicPrefix) + deviceName + "/command/light";
-	// lockCommandTopic = String(mqttTopicPrefix) + deviceName + "/command/lock";
-	
-	// // mqtt topics to publish status updates to
-	// availabilityStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/availability";
-	// obstructionStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/obstruction";
-	// doorStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/door";
-	// lightStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/light";
-	// lockStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/lock";
-	// motionStatusTopic = String(mqttTopicPrefix) + deviceName + "/status/motion";
-	
-	// bootstrapManager.setMQTTWill(availabilityStatusTopic.c_str(),"offline",1,false,true);
-	
-	// Serial.print("doorCommandTopic: ");
-	// Serial.println(doorCommandTopic);
-	// Serial.print("lightCommandTopic: ");
-	// Serial.println(lightCommandTopic);
-	// Serial.print("lockCommandTopic: ");
-	// Serial.println(lockCommandTopic);
-	// #endif
-	
-	// disabling dry contact control
-	// pinMode(TRIGGER_OPEN, INPUT_PULLUP);
-	// pinMode(TRIGGER_CLOSE, INPUT_PULLUP);
-	// pinMode(TRIGGER_LIGHT, INPUT_PULLUP);
-	// pinMode(STATUS_DOOR, OUTPUT);
-	// pinMode(STATUS_OBST, OUTPUT);
-
-	// attachInterrupt(TRIGGER_OPEN,isrDoorOpen,CHANGE);
-	// attachInterrupt(TRIGGER_CLOSE,isrDoorClose,CHANGE);
-	// attachInterrupt(TRIGGER_LIGHT,isrLight,CHANGE);
-	// pinMode(INPUT_OBST, INPUT);
 	gpio_reset_pin(INPUT_OBST);
 	gpio_set_direction(INPUT_OBST,GPIO_MODE_INPUT);
 	gpio_set_intr_type(INPUT_OBST,GPIO_INTR_ANYEDGE);
 	gpio_isr_handler_add(INPUT_OBST,isrObstruction, NULL);
-	// attachInterrupt(INPUT_OBST,isrObstruction,CHANGE);
-
-	// delay(60); // why?
-	// only need secpolus2
-	// if(controlProtocol == "drycontact"){
-	// 	Serial.println("Using dry contact control");
-	// }else if(controlProtocol == "secplus1"){
-	// 	swSerial.begin(1200, SWSERIAL_8E1, INPUT_GDO, OUTPUT_GDO, true);
-	// 	Serial.println("Using security+ 1.0");
-	// }else{
-		// default to secplus2
- 		// controlProtocol = "secplus2";
-		// swSerial.begin(9600, SWSERIAL_8N1, INPUT_GDO, OUTPUT_GDO, true); //serial
 	
-	//clear rolling code arrays
-	// memset(txSP2RollingCode,0,sizeof(txSP2RollingCode));
-	// memset(rxSP2RollingCode,0,sizeof(txSP2RollingCode));
-	// printRollingCode(txSP2RollingCode);
+	// clear rolling code arrays
+	memset(txSP2RollingCode,0,sizeof(txSP2RollingCode));
+	memset(rxSP2RollingCode,0,sizeof(txSP2RollingCode));
 
-		uart_config_t uart_config = {
-			.baud_rate = 9600,
-			.data_bits = UART_DATA_8_BITS,
-			.parity = UART_PARITY_DISABLE,
-			.stop_bits = UART_STOP_BITS_1,
-			.flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-		};
-		esp_err_t err = uart_param_config(UART_NUM_2,&uart_config);
-		if(err != ESP_OK){
-			ESP_LOGE(TAG,"ERROR CONFIGURING SERIAL");
-		}
-		err = uart_set_pin(uart_num, OUTPUT_GDO, INPUT_GDO, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-		uart_set_line_inverse(uart_num, UART_SIGNAL_RXD_INV|UART_SIGNAL_TXD_INV);
-		if(err != ESP_OK){
-			ESP_LOGE(TAG,"ERROR SETTING PINS FOR SERIAL");
-		}
-		const int uart_buffer_size = (256); //maybe adjust down?
-		// QueueHandle_t uart_queue;
-		// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, &uart_queue, 0);
-		err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, 0);
-		// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, ESP_INTR_FLAG_IRAM);
-		if(err != ESP_OK){
-			ESP_LOGE(TAG,"ERROR INSTALLING UART DRIVER");
-		}
+	uart_config_t uart_config = {
+		.baud_rate = 9600,
+		.data_bits = UART_DATA_8_BITS,
+		.parity = UART_PARITY_DISABLE,
+		.stop_bits = UART_STOP_BITS_1,
+		.flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+	};
+	esp_err_t err = uart_param_config(UART_NUM_2,&uart_config);
+	if(err != ESP_OK){
+		ESP_LOGE(TAG,"ERROR CONFIGURING SERIAL");
+	}
+	err = uart_set_pin(uart_num, OUTPUT_GDO, INPUT_GDO, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+	uart_set_line_inverse(uart_num, UART_SIGNAL_RXD_INV|UART_SIGNAL_TXD_INV);
+	if(err != ESP_OK){
+		ESP_LOGE(TAG,"ERROR SETTING PINS FOR SERIAL");
+	}
+	const int uart_buffer_size = (256); //maybe adjust down?
+	// QueueHandle_t uart_queue;
+	// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, &uart_queue, 0);
+	err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, 0);
+	// err = uart_driver_install(uart_num, uart_buffer_size, uart_buffer_size, 10, NULL, ESP_INTR_FLAG_IRAM);
+	if(err != ESP_OK){
+		ESP_LOGE(TAG,"ERROR INSTALLING UART DRIVER");
+	}
 
-		ESP_LOGI(TAG,"Using security+ 2.0");
+	ESP_LOGI(TAG,"Using security+ 2.0");
 
-		readCounterFromFlash("idCode", &idCode);
-		if(idCode >= 65535 || idCode == 0){
-			ESP_LOGI(TAG,"Generating random id");
-			short unsigned int r = esp_random();
-			// idCode = random(0x1,0xFFFF);
-			idCode = r;
-			writeCounterToFlash("idCode", &idCode);
-		}
-		ESP_LOGI(TAG,"idCode: %u", idCode);
-		readCounterFromFlash("rolling", &rollingCodeCounter);
+	readCounterFromFlash("idCode", &idCode);
+	if(idCode >= 65535 || idCode == 0){
+		ESP_LOGI(TAG,"Generating random id");
+		short unsigned int r = esp_random();
+		// idCode = random(0x1,0xFFFF);
+		idCode = r;
+		writeCounterToFlash("idCode", &idCode);
+	}
+	ESP_LOGI(TAG,"idCode: %u", idCode);
+	readCounterFromFlash("rolling", &rollingCodeCounter);
 
-		vTaskDelay(pdMS_TO_TICKS(1000)); //to let spiffs sort itself out - NOT GREAT HONESTLY, complete work-around
+	vTaskDelay(pdMS_TO_TICKS(1000)); //to let spiffs sort itself out - NOT GREAT HONESTLY, complete work-around
 
-		ESP_LOGI(TAG,"Syncing rolling code counter after reboot...");
-		sync(); // send reboot/sync to the opener on startup
-	// }
-
-	// don't need this - it looks pretty, but we're sending logs via other means anyway
-	// Serial.println("Setup Complete");
-	// Serial.println(" _____ _____ _____ _____ ____  _____ ");
-	// Serial.println("| __  |  _  |_   _|   __|     |     |");
-	// Serial.println("|    -|     | | | |  |  |  |  |  |  |");
-	// Serial.println("|__|__|__|__| |_| |_____|____/|_____|");
-	// Serial.print("version ");
-	// Serial.print(VERSION);
-	// #ifdef DISABLE_WIFI
-	// Serial.print(" (WiFi disabled)");
-	// #endif
-	// Serial.println("");
-
-	// delay(500);
+	ESP_LOGI(TAG,"Syncing rolling code counter after reboot...");
+	sync(); // send reboot/sync to the opener on startup
 }
 
 
 /*************************** MAIN LOOP ***************************/
 void loop(){
-	// if (isConfigFileOk){
-	// 	// Bootsrap loop() with Wifi, MQTT and OTA functions
-	// 	bootstrapManager.bootstrapLoop(manageDisconnections, manageQueueSubscription, manageHardwareButton);
-
-	// 	if(!setupComplete && bootstrapManager.mqttConnected()){
-	// 		setupComplete = true;
-
-	// 		// Send Home Assistant autodiscovery mqtt messages
-	// 		ha_autodiscovery_setup(&bootstrapManager);
-
-	// 		// Broadcast that we are online
-	// 		bootstrapManager.publish(availabilityStatusTopic.c_str(), "online", true);
-
-	// 		if(OUTPUT_GDO != LED_BUILTIN){
-	// 			digitalWrite(LED_BUILTIN,HIGH);
-	// 		}
-
-	// 		// if(controlProtocol == "secplus2"){
-	// 			LittleFS.begin();
-
-	// 			readCounterFromFlash("idCode", idCode);
-	// 			if(idCode == 0){
-	// 				idCode = random(0x1,0xFFFF);
-	// 				writeCounterToFlash("idCode", idCode);
-	// 			}
-	// 			readCounterFromFlash("rolling", rollingCodeCounter);
-
-	// 			Serial.println("Syncing rolling code counter after reboot...");
-	// 			sync(); // send reboot/sync to the opener on startup
-	// 		// }
-
-	// 	}
-	// }
-
 	obstructionLoop();
 	gdoStateLoop();
 	statusUpdateLoop();
-
-	// wallPanelEmulatorLoop();
-	// dryContactLoop();
 }
-
-/*************************** DETECTING THE DOOR STATE ***************************/
-// void wallPanelEmulatorLoop(){
-// 	static bool wallPanelDetected = false;
-// 	// if(controlProtocol != "secplus1" || wallPanelDetected) return;
-// 	if(wallPanelDetected) return;
-
-// 	unsigned long currentMillis = millis();
-// 	static unsigned long lastRequestMillis = 0;
-// 	static bool emulateWallPanel = false;
-// 	static unsigned long serialDetected = 0;
-// 	static uint8_t stateIndex = 0;
-
-// 	if(!serialDetected){
-// 		// if(swSerial.available()){ //serial
-// 		int buflen = 0;
-// 		uart_get_buffered_data_len(uart_num, (size_t*)&buflen);
-// 		if(buflen > 0){ //serial
-// 			serialDetected = currentMillis;
-// 		}
-
-// 		return;
-// 	}
-
-// 	// 
-// 	if(currentMillis - serialDetected < 35000 || doorState == 6){
-// 		if(currentMillis - lastRequestMillis > 2000){
-// 			ESP_LOGI(TAG,"Looking for security+ 1.0 wall panel...");
-// 			lastRequestMillis = currentMillis;
-// 		}
-
-// 		if(!wallPanelDetected && (doorState != 0 || lightState != 2)){
-// 			wallPanelDetected = true;
-// 			ESP_LOGI(TAG,"Wall panel detected.");
-// 			return;
-// 		}
-// 	}else{
-// 		if(!emulateWallPanel && !wallPanelDetected){
-// 			emulateWallPanel = true;
-// 			ESP_LOGI(TAG,"No wall panel detected. Switching to emulation mode.");
-// 		}
-
-// 		if(emulateWallPanel && currentMillis - lastRequestMillis > 250){
-// 			lastRequestMillis = currentMillis;
-// 			txSP1StaticCode[0] = byte(secplus1States[stateIndex]);
-// 			transmit(txSP1StaticCode,1);
-// 			stateIndex++;
-// 			if(stateIndex == 18) stateIndex = 15;
-// 		}
-// 	}
-// }
 
 void gdoStateLoop(){
 	// blink(false);
@@ -394,50 +231,20 @@ void gdoStateLoop(){
 				reading = true;
 				return;
 			}
-		// }
-
-		// if(controlProtocol == "secplus1"){
-		// 	// truncate to 1 byte;
-		// 	msgStart &= 0x000000FF;
-
-		// 	if(msgStart >= 0x30 && msgStart <= 0x3A){
-		// 		rxSP1StaticCode[0] = msgStart;
-		// 		byteCount = 1;
-		// 		reading = true;
-		// 		lastRX = millis();
-		// 		return;
-		// 	}
-		// }
 	}
 
 	if(reading){
-		// ESP_LOGI(TAG,"compiling message");
-		// if(controlProtocol == "secplus2"){
-			rxSP2RollingCode[byteCount] = serData;
-			byteCount++;
+		rxSP2RollingCode[byteCount] = serData;
+		byteCount++;
 
-			if(byteCount == SECPLUS2_CODE_LEN){
-				// ESP_LOGI(TAG,"message compiled");
-				reading = false;
-				msgStart = 0;
-				byteCount = 0;
+		if(byteCount == SECPLUS2_CODE_LEN){
+			// ESP_LOGI(TAG,"message compiled");
+			reading = false;
+			msgStart = 0;
+			byteCount = 0;
 
-				readRollingCode(rxSP2RollingCode, &doorState, &lightState, &lockState, &motionState, &obstructionState);
-			}
-		// }
-
-		// if(controlProtocol == "secplus1"){
-		// 	rxSP1StaticCode[byteCount] = serData;
-		// 	byteCount++;
-
-		// 	if(byteCount == 2){
-		// 		reading = false;
-		// 		msgStart = 0;
-		// 		byteCount = 0;
-
-		// 		readStaticCode(rxSP1StaticCode, doorState, lightState);
-		// 	}
-		// }
+			readRollingCode(rxSP2RollingCode, &doorState, &lightState, &lockState, &motionState, &obstructionState);
+		}
 	}
 }
 
@@ -513,6 +320,7 @@ void statusUpdateLoop(){
 void sendDoorStatus(){
 	ESP_LOGI(TAG,"Door state: %s",doorStates[doorState]);
 	send_mqtt_event(doorStates[doorState]);
+	send_mqtt_status_topic("door",doorStates[doorState]);
 	if(doorState != DOOR_OPEN){
 		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[DOOR_BIT].bit);
 	} else {
@@ -529,6 +337,7 @@ void sendDoorStatus(){
 void sendLightStatus(){
 	ESP_LOGI(TAG,"Light state: %s",lightStates[lightState]);
 	send_mqtt_event(lightStates[lightState]);
+	send_mqtt_status_topic("light",lightStates[lightState]);
 	if(lightState != LIGHT_OFF){
 		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[LIGHT_BIT].bit);
 	} else {
@@ -542,6 +351,7 @@ void sendLightStatus(){
 void sendLockStatus(){
 	ESP_LOGI(TAG,"Lock state: %s",lockStates[lockState]);
 	send_mqtt_event(lockStates[lockState]);
+	send_mqtt_status_topic("lock",lockStates[lockState]);
 	if(lockState != LOCK_UNLOCKED){
 		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[LOCK_BIT].bit);
 	} else {
@@ -571,6 +381,7 @@ void sendMotionStatus(){
 void sendObstructionStatus(){
 	ESP_LOGI(TAG,"Obstruction status: %s",obstructionStates[obstructionState]);
 	send_mqtt_event(obstructionStates[obstructionState]);
+	send_mqtt_status_topic("obstruction",obstructionStates[obstructionState]);
 	if(obstructionState != OBST_OBSTRUCTED){
 		xEventGroupSetBits(ratgdo_status.state,ratgdo_status.entries[OBSTRUCTION_BIT].bit);
 	} else {
@@ -587,56 +398,13 @@ void sendObstructionStatus(){
 
 void transmit(uint8_t* payload, unsigned int length){
 	esp_err_t err;
-	// if(controlProtocol == "secplus2"){
-	// gpio_set_level(OUTPUT_GDO, HIGH); // pull the line high for 1305 micros so the door opener responds to the message
-	// uart_set_line_inverse(uart_num, UART_SIGNAL_INV_DISABLE);
-	// vTaskDelay(pdMS_TO_TICKS(1305));
 
-	// uint8_t dummy = 0;
-	// uart_set_baudrate(uart_num,6646);
-	// uart_write_bytes(uart_num,(char*)&dummy,1);
-	// uart_wait_tx_done(uart_num,2);
-	// uart_wait_tx_done(uart_num,2);
-	// uart_set_baudrate(uart_num,9600);
-	// uart_write_bytes_with_break(uart_nun,payload,0,12);
-
-	// uart_write_bytes_with_break(uart_num,payload,1,14);
-	// uart_tx_all()
-	// uart_hal_tx_break(&(uart_context[uart_num].hal),0);
-	// err = uart_wait_tx_done(uart_num, 2);
-	// if(err != ESP_OK){
-	// 	ESP_LOGE(TAG,"UART TIMEOUT TRANSMITTING BREAK1");
-	// }
-
-/*
-CURRENT
-*/
+	// lead transmissions with a break - not supported by uart driver directly, so we do a little flip.  This isn't good practice, but it works for now.
 	uart_set_line_inverse(uart_num, UART_SIGNAL_INV_DISABLE); //pulse high (but makes for serial low due to transistor)
 	usleep(1305);
 	uart_set_line_inverse(uart_num, UART_SIGNAL_RXD_INV|UART_SIGNAL_TXD_INV); //put back inversion
 	usleep(1260);
 
-/*
-END CURRENT
-*/
-
-	// uart_write_bytes_with_break(uart_num,payload,1,12);
-	// uart_hal_tx_break(&(uart_context[uart_num].hal),0);
-	
-	// if(err != ESP_OK){
-	// 	ESP_LOGE(TAG,"UART TIMEOUT TRANSMITTING BREAK2");
-	// }
-
-
-	// esp_rom_delay_us(1305);
-	// uart_set_line_inverse(uart_num, UART_SIGNAL_RXD_INV|UART_SIGNAL_TXD_INV);
-	// gpio_set_level(OUTPUT_GDO, LOW); // bring the line low
-
-	// vTaskDelay(pdMS_TO_TICKS(1260)); // "LOW" pulse duration before the message start
-	// esp_rom_delay_us(1260);
-	// }
-	
-	// swSerial.write(payload,length); //serial
 	ESP_LOGD(TAG,"TEST: WRITING %u TO UART",length);
 	int status = uart_write_bytes(uart_num, payload, length);
 	ESP_LOGD(TAG,"TEST: WAITING FOR %i TO TRANSMIT",status);
@@ -653,10 +421,6 @@ void pullLow(){
 }
 
 void sync(){
-	// if(controlProtocol != "secplus2"){
-	// 	Serial.println("sync only needed with security+ 2.0");
-	// 	return;
-	// }
 
 	getRollingCode("reboot1");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
@@ -682,7 +446,7 @@ void sync(){
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
 	vTaskDelay(pdMS_TO_TICKS(65));
 
-	vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around NOT GREAT to let spiffs sort itself out
+	// vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around NOT GREAT to let spiffs sort itself out
 
 	writeCounterToFlash("rolling",&rollingCodeCounter);
 }
@@ -696,6 +460,12 @@ void openDoor(){
 	}
 	ESP_LOGI(TAG,"Opening door");
 
+	//if we're cancelling movement, we need to 'toggle twice'
+	if(doorState == DOOR_CLOSING){
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		toggleDoor();
+	}
+
 	toggleDoor();
 }
 
@@ -705,6 +475,13 @@ void closeDoor(){
 		return;
 	}
 	ESP_LOGI(TAG,"Closing door");
+	
+	//if we're cancelling movement, we need to 'toggle twice'
+	if(doorState == DOOR_OPENING){
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		toggleDoor();
+	}
+	
 	toggleDoor();
 }
 
@@ -717,34 +494,19 @@ void stopDoor(){
 }
 
 void toggleDoor(){
-	// if(controlProtocol == "drycontact"){
-	// 	pullLow();
-	// }else if(controlProtocol == "secplus1"){
-	// 	uint8_t delayLen = (lastRX + 275) - millis();
-	// 	delay(delayLen);
+	ESP_LOGI(TAG,"send door1");
+	getRollingCode("door1");
+	transmit(txSP2RollingCode, SECPLUS2_CODE_LEN);//serial
 
-	// 	getStaticCode("door1");
-	// 	transmit(txSP1StaticCode,1);
-	// 	delay(80);
-	// 	getStaticCode("door2");
-	// 	transmit(txSP1StaticCode,1);
-	// 	delay(25);
-	// 	transmit(txSP1StaticCode,1);
-	// }else{
-		ESP_LOGI(TAG,"send door1");
-		getRollingCode("door1");
-		transmit(txSP2RollingCode, SECPLUS2_CODE_LEN);//serial
+	vTaskDelay(pdMS_TO_TICKS(40));
 
-		vTaskDelay(pdMS_TO_TICKS(40));
+	ESP_LOGI(TAG,"send door2");
+	getRollingCode("door2");
+	transmit(txSP2RollingCode, SECPLUS2_CODE_LEN); //serial
 
-		ESP_LOGI(TAG,"send door2");
-		getRollingCode("door2");
-		transmit(txSP2RollingCode, SECPLUS2_CODE_LEN); //serial
+	vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
 
-		vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
-
-		writeCounterToFlash("rolling",&rollingCodeCounter);
-	// }
+	writeCounterToFlash("rolling",&rollingCodeCounter);
 }
 
 // Light functions
@@ -765,17 +527,10 @@ void lightOff(){
 }
 
 void toggleLight(){
-	// if(controlProtocol == "drycontact"){
-	// 	Serial.println("Light control not supported with dry contact control.");
-	// }else if(controlProtocol == "secplus1"){
-	// 	getStaticCode("light");
-	// 	transmit(txSP1StaticCode,1);
-	// }else{
-		getRollingCode("light");
-		transmit(txSP2RollingCode,SECPLUS2_CODE_LEN); //serial
-		vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
-		writeCounterToFlash("rolling",&rollingCodeCounter);
-	// }
+	getRollingCode("light");
+	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN); //serial
+	vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
+	writeCounterToFlash("rolling",&rollingCodeCounter);
 }
 
 // Lock functions
@@ -796,12 +551,8 @@ void unlock(){
 }
 
 void toggleLock(){
-	// if(controlProtocol == "secplus1"){
-	// 	ESP_LOGI(TAG,"%s","Lockout not supported with security+ 1.0");
-	// }else{
-		getRollingCode("lock");
-		transmit(txSP2RollingCode,SECPLUS2_CODE_LEN); //serial
-		vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
-		writeCounterToFlash("rolling",&rollingCodeCounter);
-	// }
+	getRollingCode("lock");
+	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN); //serial
+	vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around to let SPIFFS sort itself out - NOT GREAT
+	writeCounterToFlash("rolling",&rollingCodeCounter);
 }
