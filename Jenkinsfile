@@ -3,13 +3,13 @@ pipeline {
     dockerfile {
       filename 'esp_idf_docker_builder/Dockerfile'
       args '--dns 10.0.1.44 --dns 10.0.1.43'
+      additionalBuildArgs "--build-arg jenkinsUserId=\$(id -u jenkins)"
     }
 
   }
   stages {
     stage('build') {
       steps {
-        // withCredentials([GitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
           sh '''export IDF_PATH=/esp-idf;
 . /esp-idf/export.sh;
 git submodule update --init --recursive;
@@ -18,7 +18,6 @@ chmod +x build.sh;
         sh '''cd out;
 ls -lh
 '''
-        // }
       }
     }
 

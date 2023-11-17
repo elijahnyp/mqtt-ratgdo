@@ -32,3 +32,8 @@ RUN cd /esp-idf/ && ./install.sh && \
 
 RUN pip3 install requests
 
+ARG jenkinsUserId=
+RUN if ! id $jenkinsUserId; then \
+    usermod -u ${jenkinsUserId} jenkins; \
+    groupmod -g ${nodeId} jenkins; \
+  fi
