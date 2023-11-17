@@ -185,6 +185,13 @@ void setup(){
 	ESP_LOGI(TAG,"Syncing rolling code counter after reboot...");
 	sync(); // send reboot/sync to the opener on startup
 
+	//light status is screwey, so turn on the lights then sync again
+	lightOn();
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	sync();
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	lightoff();
+
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	sendDoorStatus();
 	sendLightStatus();
