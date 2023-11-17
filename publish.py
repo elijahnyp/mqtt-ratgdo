@@ -83,7 +83,7 @@ for (root, _, files) in os.walk('out'):
                     print(f"failed to upload firmware: {resp.status_code}")
                     print(f"response: {resp.content}")
                     exit(1)
-            except:    
+            except Exception as e:    
                 if(resp.status_code != 200):
                     print(f"failed to upload firmware: {resp.status_code}")
                     print(f"response: {resp.content}")
@@ -93,6 +93,7 @@ for (root, _, files) in os.walk('out'):
                     print(f"data: {data}")
                     print(f"files: {files}")
                     print(f"token: {TOKEN}")
+                    print(str(e))
                     exit(1)
             print("success")
         except Exception as e:
