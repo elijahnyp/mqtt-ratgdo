@@ -184,6 +184,12 @@ void setup(){
 
 	ESP_LOGI(TAG,"Syncing rolling code counter after reboot...");
 	sync(); // send reboot/sync to the opener on startup
+
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	sendDoorStatus();
+	sendLightStatus();
+	sendLockStatus();
+	sendObstructionStatus();
 }
 
 
@@ -424,27 +430,27 @@ void sync(){
 
 	getRollingCode("reboot1");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	getRollingCode("reboot2");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	getRollingCode("reboot3");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	getRollingCode("reboot4");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	getRollingCode("reboot5");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	getRollingCode("reboot6");
 	transmit(txSP2RollingCode,SECPLUS2_CODE_LEN);
-	vTaskDelay(pdMS_TO_TICKS(65));
+	vTaskDelay(pdMS_TO_TICKS(100));
 
 	// vTaskDelay(pdMS_TO_TICKS(1000)); //complete work around NOT GREAT to let spiffs sort itself out
 

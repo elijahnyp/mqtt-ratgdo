@@ -366,5 +366,5 @@ void printRollingCode(uint8_t code[SECPLUS2_CODE_LEN]){
 		// if(code[i] <= 0x0f) ESP_LOGI(TAG,"0");
 		// ESP_LOGI(TAG,"%x",code[i]);
 	}
-	ESP_LOGI(TAG,"Rolling Code: %s",str);
+	// ESP_LOGI(TAG,"Rolling Code: %s",str); //we don't need to see the rolling code in mqtt for now
 }
