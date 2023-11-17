@@ -72,12 +72,15 @@ for (root, _, files) in os.walk('out'):
             files={
                 'firmware': open(f'{root}/{f}', 'rb')
             }
-            resp = requests.post(
-                url='https://firmware.wangwood.house/admin/new_version',
-                headers={'Authorization': f"Bearer {TOKEN}"},
-                data=data,
-                files=files
-            )
+            try:
+                resp = requests.post(
+                    url='https://firmware.wangwood.house/admin/new_version',
+                    headers={'Authorization': f"Bearer {TOKEN}"},
+                    data=data,
+                    files=files
+                )
+            except Exception as e:
+                print(str(e))
             try:
                 if(resp.json()['status'].lower() != 'updated'):
                     print(f"failed to upload firmware: {resp.status_code}")
