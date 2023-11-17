@@ -32,9 +32,4 @@ RUN cd /esp-idf/ && ./install.sh && \
 
 RUN pip3 install requests
 
-ARG jenkinsUserId=
-RUN echo ${jenkinsUserId}
- 
-RUN if ! id $jenkinsUserId; then \
-    usermod -u ${jenkinsUserId} jenkins; \
-  fi
+RUN useradd -m -u 1000 -o -s /bin/sh jenkins
