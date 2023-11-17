@@ -190,7 +190,7 @@ void setup(){
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	sync();
 	vTaskDelay(pdMS_TO_TICKS(1000));
-	lightoff();
+	lightOff();
 
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	sendDoorStatus();
