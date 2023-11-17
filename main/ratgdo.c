@@ -186,10 +186,11 @@ void setup(){
 	sync(); // send reboot/sync to the opener on startup
 
 	//light status is screwey, so turn on the lights then sync again
+	vTaskDelay(pdMS_TO_TICKS(5000));
 	lightOn();
-	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(5000));
 	sync();
-	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(5000));
 	lightOff();
 
 	vTaskDelay(pdMS_TO_TICKS(1000));
