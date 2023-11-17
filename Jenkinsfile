@@ -15,7 +15,6 @@ pipeline {
 git submodule update --init --recursive;
 chmod +x build.sh;
 ./build.sh ratgdo'''
-        sh 'if[[ ! -d ./out ]]; then mkdir out; fi'
         sh '''cd out;
 ls -lh
 '''
