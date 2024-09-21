@@ -41,6 +41,8 @@ const uart_port_t uart_num = UART_NUM_2;
 extern "C" {
 #endif
 void mqtt_handler(char* topic, uint8_t* payload, unsigned int length);
+void register_ha();
+
 
 #define DOOR_BIT 0
 #define LIGHT_BIT 1
@@ -51,27 +53,27 @@ ww_cust_status_t ratgdo_status = {
 		.state = NULL,
 		.num_entries = 4,
 		.entries[0] = {
-			.on = "Closed",
-			.off = "Open",
-			.name = "Door",
+			.on = "closed",
+			.off = "open",
+			.name = "door",
 			.bit = (1<<0)
 		},
 		.entries[1] = {
-			.on = "Light On",
-			.off = "Light Off",
-			.name = "Light",
+			.on = "on",
+			.off = "off",
+			.name = "light",
 			.bit = (1<<1)
 		},
 		.entries[2] = {
-			.on = "Locked",
-			.off = "Unlocked",
-			.name = "Lock",
+			.on = "locked",
+			.off = "unlocked",
+			.name = "lock",
 			.bit = (1<<2)
 		},
 		.entries[3] = {
-			.on = "Clear",
-			.off = "Obstructed",
-			.name = "Obstructed",
+			.on = "clear",
+			.off = "obstructed",
+			.name = "obstructed",
 			.bit = (1<<3)
 		}
 	};
@@ -81,6 +83,7 @@ void app_main(void){
 	ratgdo_status.state = xEventGroupCreate();
 	wangwood_register_custom_status(&ratgdo_status);
 	setup();
+	register_ha();
 	while(true){
 		loop();
 		vTaskDelay(10);
@@ -105,10 +108,10 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
   else if(strncmp((char*)payload,"close",length) == 0){
 	ESP_LOGI(TAG,"CLOSE");
 	closeDoor();
-  } else if(strncmp((char*)payload,"lighton",length) == 0){
+  } else if(strncmp((char*)payload,"on",length) == 0){
 	ESP_LOGI(TAG,"LIGHT ON");
 	lightOn();
-  } else if(strncmp((char*)payload,"lightoff",length) == 0){
+  } else if(strncmp((char*)payload,"off",length) == 0){
 	ESP_LOGI(TAG,"LIGHT OFF");
 	lightOff();
   } else if(strncmp((char*)payload,"lock",length) == 0){
@@ -124,6 +127,87 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
 	deleteCounter("rolling");
 
   }
+}
+
+void register_ha(){
+	ha_entity_t* ha_head = NULL;
+	ha_entity_t ha_light = {
+		.enabled_by_default = true,
+		.component = "light",
+		.slug = "light"
+	};
+	ha_head = add_ha_entity(ha_head,&ha_light);
+	ha_entity_topic_t ha_light_state = {
+		.label = "state_topic",
+		.topic = "status/light",
+		.next = NULL
+	};
+	add_ha_entity_topic(&ha_light,&ha_light_state);
+	ha_entity_topic_t ha_light_state_topic = {
+		.label = "state_value_template",
+		.topic = "{{ 'None' if value = 'unknown' else value }}"
+	};
+	add_ha_entity_topic(&ha_light,&ha_light_state_topic);
+	ha_entity_topic_t ha_light_command = {
+		.label = "command_topic",
+		.topic = "command"
+	};
+	add_ha_entity_topic(&ha_light,&ha_light_command);
+	ha_entity_topic_t ha_light_payload_on = {
+		.label = "payload_on",
+		.topic = "on"
+	};
+	add_ha_entity_topic(&ha_light,&ha_light_payload_on);
+	ha_entity_topic_t ha_light_payload_off = {
+		.label = "payload_off",
+		.topic = "off"
+	};
+	add_ha_entity_topic(&ha_light,&ha_light_payload_off);
+
+	//door items
+	ha_entity_t ha_door = {
+		.enabled_by_default = true,
+		.component = "switch",
+		.slug = "switch"
+	};
+	ha_head = add_ha_entity(ha_head,&ha_light);
+
+	ha_entity_topic_t ha_door_switch = {
+		.label = "command_topic",
+		.topic = "command"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch);
+	ha_entity_topic_t ha_door_switch_payload_on = {
+		.label = "payload_on",
+		.topic = "open"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch_payload_on);
+	ha_entity_topic_t ha_door_switch_payload_off = {
+		.label = "payload_off",
+		.topic = "close"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch_payload_off);
+	ha_entity_topic_t ha_door_switch_state_topic = {
+		.label = "state_topic",
+		.topic = "status/door"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch_state_topic);
+	ha_entity_topic_t ha_door_switch_state_on = {
+		.label = "state_on",
+		.topic = "opened"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch_state_on);
+	ha_entity_topic_t ha_door_switch_state_off = {
+		.label = "state_off",
+		.topic = "closed"
+	};
+	add_ha_entity_topic(&ha_door,&ha_door_switch_state_off);
+
+	if(set_ha_discovery_entities(ha_head) != ESP_OK){
+		ESP_LOGE(TAG,"configuring ha discovery failed");
+	} else {
+		send_ha_discovery_messages();
+	}
 }
 
 #ifdef __cplusplus
