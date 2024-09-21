@@ -91,9 +91,9 @@ void app_main(void){
 }
 
 void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
-//   ESP_LOGI(TAG,"MQTT Message Received");
-//   ESP_LOGI(TAG,"Topic: %s", topic);
-//   ESP_LOGI(TAG,"Length: %i", length);
+  ESP_LOGI(TAG,"MQTT Message Received");
+  ESP_LOGI(TAG,"Topic: %s", topic);
+  ESP_LOGI(TAG,"Length: %i", length);
 //   char* payload_c;
 //   payload_c = (char*)malloc(sizeof(char) * length);
 //   for(int i=0; i<length; i++){
