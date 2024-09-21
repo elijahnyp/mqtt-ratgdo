@@ -130,8 +130,8 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
 }
 
 void register_ha(){
-	esp_log_level_set("HA_DISCOVERY", ESP_LOG_DEBUG);
-	esp_log_level_set(TAG, ESP_LOG_DEBUG);
+	// esp_log_level_set("HA_DISCOVERY", ESP_LOG_DEBUG);
+	// esp_log_level_set(TAG, ESP_LOG_DEBUG);
 	ha_entity_t* ha_head = NULL;
 	ha_entity_t ha_light = {
 		.enabled_by_default = true,
@@ -144,11 +144,11 @@ void register_ha(){
 		.topic = "~/status/light"
 	};
 	add_ha_entity_topic(&ha_light,&ha_light_state);
-	ha_entity_topic_t ha_light_state_topic = {
+	ha_entity_topic_t ha_light_state_template = {
 		.label = "state_value_template",
-		.topic = "{{ 'None' if value = 'unknown' else value }}"
+		.topic = "{{ 'None' if value == 'unknown' else 'ON' if value == 'on' else 'OFF' }}"
 	};
-	add_ha_entity_topic(&ha_light,&ha_light_state_topic);
+	add_ha_entity_topic(&ha_light,&ha_light_state_template);
 	ha_entity_topic_t ha_light_command = {
 		.label = "command_topic",
 		.topic = "~/command"
