@@ -144,11 +144,11 @@ void register_ha(){
 		.topic = "~/status/light"
 	};
 	add_ha_entity_topic(&ha_light,&ha_light_state);
-	ha_entity_topic_t ha_light_state_template = {
-		.label = "state_value_template",
-		.topic = "{{ 'None' if value == 'unknown' else 'ON' if value == 'on' else 'OFF' }}"
-	};
-	add_ha_entity_topic(&ha_light,&ha_light_state_template);
+	// ha_entity_topic_t ha_light_state_template = {
+	// 	.label = "state_value_template",
+	// 	.topic = "{{ 'None' if value == 'unknown' else 'ON' if value == 'on' else 'OFF' }}"
+	// };
+	// add_ha_entity_topic(&ha_light,&ha_light_state_template);
 	ha_entity_topic_t ha_light_command = {
 		.label = "command_topic",
 		.topic = "~/command"
@@ -195,7 +195,7 @@ void register_ha(){
 	add_ha_entity_topic(&ha_door,&ha_door_switch_state_topic);
 	ha_entity_topic_t ha_door_switch_state_on = {
 		.label = "state_on",
-		.topic = "opened"
+		.topic = "open"
 	};
 	add_ha_entity_topic(&ha_door,&ha_door_switch_state_on);
 	ha_entity_topic_t ha_door_switch_state_off = {
