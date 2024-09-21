@@ -141,7 +141,7 @@ void register_ha(){
 	ha_head = add_ha_entity(ha_head,&ha_light);
 	ha_entity_topic_t ha_light_state = {
 		.label = "state_topic",
-		.topic = "status/light"
+		.topic = "~/status/light"
 	};
 	add_ha_entity_topic(&ha_light,&ha_light_state);
 	ha_entity_topic_t ha_light_state_topic = {
@@ -151,7 +151,7 @@ void register_ha(){
 	add_ha_entity_topic(&ha_light,&ha_light_state_topic);
 	ha_entity_topic_t ha_light_command = {
 		.label = "command_topic",
-		.topic = "command"
+		.topic = "~/command"
 	};
 	add_ha_entity_topic(&ha_light,&ha_light_command);
 	ha_entity_topic_t ha_light_payload_on = {
@@ -175,7 +175,7 @@ void register_ha(){
 
 	ha_entity_topic_t ha_door_switch = {
 		.label = "command_topic",
-		.topic = "command"
+		.topic = "~/command"
 	};
 	add_ha_entity_topic(&ha_door,&ha_door_switch);
 	ha_entity_topic_t ha_door_switch_payload_on = {
@@ -190,7 +190,7 @@ void register_ha(){
 	add_ha_entity_topic(&ha_door,&ha_door_switch_payload_off);
 	ha_entity_topic_t ha_door_switch_state_topic = {
 		.label = "state_topic",
-		.topic = "status/door"
+		.topic = "~/status/door"
 	};
 	add_ha_entity_topic(&ha_door,&ha_door_switch_state_topic);
 	ha_entity_topic_t ha_door_switch_state_on = {
