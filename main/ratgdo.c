@@ -130,6 +130,8 @@ void mqtt_handler(char* topic, uint8_t* payload, unsigned int length){
 }
 
 void register_ha(){
+	esp_log_level_set("HA_DISCOVERY", ESP_LOG_DEBUG);
+	esp_log_level_set(TAG, ESP_LOG_DEBUG);
 	ha_entity_t* ha_head = NULL;
 	ha_entity_t ha_light = {
 		.enabled_by_default = true,
@@ -139,8 +141,7 @@ void register_ha(){
 	ha_head = add_ha_entity(ha_head,&ha_light);
 	ha_entity_topic_t ha_light_state = {
 		.label = "state_topic",
-		.topic = "status/light",
-		.next = NULL
+		.topic = "status/light"
 	};
 	add_ha_entity_topic(&ha_light,&ha_light_state);
 	ha_entity_topic_t ha_light_state_topic = {
@@ -170,7 +171,7 @@ void register_ha(){
 		.component = "switch",
 		.slug = "switch"
 	};
-	ha_head = add_ha_entity(ha_head,&ha_light);
+	ha_head = add_ha_entity(ha_head,&ha_door);
 
 	ha_entity_topic_t ha_door_switch = {
 		.label = "command_topic",
@@ -202,6 +203,18 @@ void register_ha(){
 		.topic = "closed"
 	};
 	add_ha_entity_topic(&ha_door,&ha_door_switch_state_off);
+
+	ha_entity_t* testcurrent = ha_head;
+	while(testcurrent != NULL){
+		ESP_LOGD(TAG,"  slug: %s",testcurrent->slug);
+		ha_entity_topic_t* testtopic = testcurrent->topics;
+		while(testtopic != NULL){
+		ESP_LOGD(TAG,"    label: %s",testtopic->label);
+		ESP_LOGD(TAG,"    topic: %s",testtopic->topic);
+		testtopic = testtopic->next;
+		}
+		testcurrent = testcurrent->next;
+	}
 
 	if(set_ha_discovery_entities(ha_head) != ESP_OK){
 		ESP_LOGE(TAG,"configuring ha discovery failed");
