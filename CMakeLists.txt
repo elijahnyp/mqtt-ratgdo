@@ -6,3 +6,6 @@ cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(ratgdo)
+
+# workaround for bug https://github.com/espressif/esp-idf/issues/14582
+idf_build_set_property(COMPILE_DEFINITIONS "dhcp_network_changed=dhcp_network_changed_link_up" APPEND)
