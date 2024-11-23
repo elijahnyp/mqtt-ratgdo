@@ -12,103 +12,103 @@
 bool nvs_initiated = false;
 esp_err_t readCounterFromFlash(const char *type, unsigned int *counter){
 	*counter = 0;
-	return ESP_OK;
-	// esp_err_t err;
-	// if(!nvs_initiated){
-	// 	err = nvs_flash_init();
-	// 	if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-	// 		ESP_ERROR_CHECK(nvs_flash_erase());
-	// 		err = nvs_flash_init();
-	// 		nvs_initiated =  true;
-	// 	}
-	// 	if(err != ESP_OK){
-	// 		return ESP_ERR_INVALID_STATE;
-	// 	}
-	// }
-	// nvs_handle_t handle;
-	// err = nvs_open(type, NVS_READONLY, &handle);
-	// switch (err){
-	// 	case ESP_OK:
-	// 		break;
-	// 	case ESP_ERR_NVS_NOT_FOUND:
-	// 		err = nvs_open(type,NVS_READWRITE,&handle);
-	// 		if(err != ESP_OK){
-	// 			return ESP_ERR_INVALID_STATE;
-	// 		}
-	// 		err = nvs_set_u32(handle,type,0);
-	// 		if(err != ESP_OK){
-	// 			ESP_LOGE(TAG,"Error setting %s in nvram, defaulting to 0",type);
-	// 			counter = 0;
-	// 			return ESP_ERR_INVALID_STATE;
-	// 		} else {
-	// 			counter = 0;
-	// 			return ESP_OK;
-	// 		}
-	// 		break;
-	// 	default:
-	// 		ESP_LOGE(TAG,"error opening NVS handle %s",type);
-	// }
-	// nvs_get_u32(handle,type,(uint32_t*)counter);
-	// nvs_commit(handle);
-	// nvs_close(handle);
 	// return ESP_OK;
+	esp_err_t err;
+	if(!nvs_initiated){
+		err = nvs_flash_init();
+		if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+			ESP_ERROR_CHECK(nvs_flash_erase());
+			err = nvs_flash_init();
+			nvs_initiated =  true;
+		}
+		if(err != ESP_OK){
+			return ESP_ERR_INVALID_STATE;
+		}
+	}
+	nvs_handle_t handle;
+	err = nvs_open(type, NVS_READONLY, &handle);
+	switch (err){
+		case ESP_OK:
+			break;
+		case ESP_ERR_NVS_NOT_FOUND:
+			err = nvs_open(type,NVS_READWRITE,&handle);
+			if(err != ESP_OK){
+				return ESP_ERR_INVALID_STATE;
+			}
+			err = nvs_set_u32(handle,type,0);
+			if(err != ESP_OK){
+				ESP_LOGE(TAG,"Error setting %s in nvram, defaulting to 0",type);
+				counter = 0;
+				return ESP_ERR_INVALID_STATE;
+			} else {
+				counter = 0;
+				return ESP_OK;
+			}
+			break;
+		default:
+			ESP_LOGE(TAG,"error opening NVS handle %s",type);
+	}
+	nvs_get_u32(handle,type,(uint32_t*)counter);
+	nvs_commit(handle);
+	nvs_close(handle);
+	return ESP_OK;
 }
 
 esp_err_t writeCounterToFlash(const char *type, unsigned int *counter){
-	return ESP_OK;
-	// esp_err_t err;
-	// if(!nvs_initiated){
-	// 	err = nvs_flash_init();
-	// 	if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-	// 		ESP_ERROR_CHECK(nvs_flash_erase());
-	// 		err = nvs_flash_init();
-	// 		nvs_initiated =  true;
-	// 	}
-	// 	if(err != ESP_OK){
-	// 		return ESP_ERR_INVALID_STATE;
-	// 	}
-	// }
-	// nvs_handle_t handle;
-	// err = nvs_open(type, NVS_READWRITE, &handle);
-	// if(err != ESP_OK){
-	// 	ESP_LOGE(TAG,"error opening NVS handle to write %s",type);
-	// }
-	// err = nvs_set_u32(handle,type,(uint32_t)counter);
-	// nvs_commit(handle);
-	// nvs_close(handle);
-	// if(err != ESP_OK){
-	// 	return ESP_ERR_NO_MEM;
-	// } else {
-	// 	return ESP_OK;
-	// }
+	// return ESP_OK;
+	esp_err_t err;
+	if(!nvs_initiated){
+		err = nvs_flash_init();
+		if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+			ESP_ERROR_CHECK(nvs_flash_erase());
+			err = nvs_flash_init();
+			nvs_initiated =  true;
+		}
+		if(err != ESP_OK){
+			return ESP_ERR_INVALID_STATE;
+		}
+	}
+	nvs_handle_t handle;
+	err = nvs_open(type, NVS_READWRITE, &handle);
+	if(err != ESP_OK){
+		ESP_LOGE(TAG,"error opening NVS handle to write %s",type);
+	}
+	err = nvs_set_u32(handle,type,(uint32_t)counter);
+	nvs_commit(handle);
+	nvs_close(handle);
+	if(err != ESP_OK){
+		return ESP_ERR_NO_MEM;
+	} else {
+		return ESP_OK;
+	}
 }
 
 esp_err_t deleteCounter(const char* type){
-	return ESP_OK;
-	// esp_err_t err;
-	// if(!nvs_initiated){
-	// 	err = nvs_flash_init();
-	// 	if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-	// 		ESP_ERROR_CHECK(nvs_flash_erase());
-	// 		err = nvs_flash_init();
-	// 		nvs_initiated =  true;
-	// 	}
-	// 	if(err != ESP_OK){
-	// 		return ESP_ERR_INVALID_STATE;
-	// 	}
-	// }
-	// nvs_handle_t handle;
-	// err = nvs_open(type,NVS_READWRITE,&handle);
-	// if(err == ESP_ERR_NVS_NOT_FOUND){
-	// 	return ESP_OK;
-	// }
-	// err = nvs_erase_key(handle,type);
-	// if(err != ESP_OK){
-	// 	return ESP_ERR_INVALID_STATE;
-	// }
-	// nvs_commit(handle);
-	// nvs_close(handle);
 	// return ESP_OK;
+	esp_err_t err;
+	if(!nvs_initiated){
+		err = nvs_flash_init();
+		if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+			ESP_ERROR_CHECK(nvs_flash_erase());
+			err = nvs_flash_init();
+			nvs_initiated =  true;
+		}
+		if(err != ESP_OK){
+			return ESP_ERR_INVALID_STATE;
+		}
+	}
+	nvs_handle_t handle;
+	err = nvs_open(type,NVS_READWRITE,&handle);
+	if(err == ESP_ERR_NVS_NOT_FOUND){
+		return ESP_OK;
+	}
+	err = nvs_erase_key(handle,type);
+	if(err != ESP_OK){
+		return ESP_ERR_INVALID_STATE;
+	}
+	nvs_commit(handle);
+	nvs_close(handle);
+	return ESP_OK;
 }
 
 // esp_err_t readCounterFromFlash(const char *type, unsigned int *counter){
